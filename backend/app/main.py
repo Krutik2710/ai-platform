@@ -8,6 +8,8 @@ from .rag.db import init_db
 from .rag.ingestion import ingest_document
 from .rag.retrieval import search_similar_chunks
 
+from .rag.generation import generate_answer
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -62,8 +64,15 @@ def query_documents(request: QueryRequest):
         request.limit,
     )
 
+    context = [result["text"] for result in results]
+
+    answer = generate_answer(
+        request.question,
+        context,
+    )
+
     return {
         "question": request.question,
+        "answer": answer,
         "results": results,
     }
-
