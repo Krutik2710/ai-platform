@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-platform-api
+  namespace: ai-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-platform-api
+  template:
+    metadata:
+      labels:
+        app: ai-platform-api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/krutik2710/ai-platform-api:dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
