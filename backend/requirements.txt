@@ -6,3 +6,4 @@ openai
 ollama
 psycopg[binary]
 pgvector
+pypdf

@@ -1,7 +1,7 @@
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 
 from .rag.db import init_db
@@ -11,6 +11,10 @@ from .rag.retrieval import search_similar_chunks
 from .rag.generation import generate_answer
 
 from .rag.chat import create_session, add_message, get_messages
+
+from .rag.document_loader import extract_text
+
+
 
 
 @asynccontextmanager
@@ -97,3 +101,30 @@ def chat_history(session_id: int):
         "session_id": session_id,
         "messages": get_messages(session_id),
     }
+
+@app.post("/documents/upload")
+async def upload_document_file(file: UploadFile = File(...)):
+    try:
+        content = await file.read()
+
+        text = extract_text(
+            file.filename or "document",
+            content,
+        )
+
+        document_id = ingest_document(
+            file.filename or "document",
+            text,
+        )
+
+        return {
+            "document_id": document_id,
+            "filename": file.filename,
+            "status": "ingested",
+        }
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
