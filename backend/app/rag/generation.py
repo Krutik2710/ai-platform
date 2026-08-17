@@ -1,13 +1,11 @@
-import os
-
-from openai import OpenAI
+from ollama import Client
 
 
-MODEL = "gpt-4.1-mini"
+MODEL = "llama3.1:8b"
 
 
 def generate_answer(question: str, context: list[str]) -> str:
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    client = Client(host="http://ollama:11434")
 
     context_text = "\n\n".join(context)
 
@@ -24,9 +22,15 @@ Question:
 {question}
 """
 
-    response = client.responses.create(
+    response = client.chat(
         model=MODEL,
-        input=prompt,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
     )
 
-    return response.output_text
+    return response["message"]["content"]
+    
