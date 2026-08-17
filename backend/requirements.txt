@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
 boto3
-qdrant-client
 sentence-transformers
 python-multipart
+psycopg[binary]
