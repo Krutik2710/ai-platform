@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/krutik2710/ai-platform-api:sha-c92c326
+          image: ghcr.io/krutik2710/ai-platform-api
           imagePullPolicy: IfNotPresent
 
           ports:
