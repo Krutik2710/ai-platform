@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from backend.app.rag.db import init_db
 from backend.app.rag.ingestion import ingest_document
+from backend.app.rag.retrieval import search_similar_chunks
 
 
 @asynccontextmanager
@@ -49,3 +50,19 @@ def upload_document(document: DocumentRequest):
             status_code=400,
             detail=str(exc),
         )
+
+class QueryRequest(BaseModel):
+    question: str
+    limit: int = 5
+
+@app.post("/query")
+def query_documents(request: QueryRequest):
+    results = search_similar_chunks(
+        request.question,
+        request.limit,
+    )
+
+    return {
+        "question": request.question,
+        "results": results,
+    }
