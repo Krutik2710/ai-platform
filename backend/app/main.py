@@ -55,3 +55,15 @@ class QueryRequest(BaseModel):
     question: str
     limit: int = 5
 
+@app.post("/query")
+def query_documents(request: QueryRequest):
+    results = search_similar_chunks(
+        request.question,
+        request.limit,
+    )
+
+    return {
+        "question": request.question,
+        "results": results,
+    }
+
