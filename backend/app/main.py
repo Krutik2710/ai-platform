@@ -1,15 +1,17 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from app.rag.db import init_db
-from app.rag.ingestion import ingest_document
+from backend.app.rag.db import init_db
+from backend.app.rag.ingestion import ingest_document
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
+    if os.getenv("INIT_DB", "true").lower() == "true":
+        init_db()
     yield
 
 

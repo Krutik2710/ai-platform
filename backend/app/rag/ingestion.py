@@ -1,6 +1,6 @@
-from app.rag.db import get_connection
-from app.rag.embeddings import create_embedding
-from app.rag.chunking import chunk_text
+from backend.app.rag.db import get_connection
+from backend.app.rag.embeddings import create_embedding
+from backend.app.rag.chunking import chunk_text
 
 
 def ingest_document(filename: str, text: str) -> int:
