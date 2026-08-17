@@ -6,4 +6,4 @@ resources:
   - backend
   - postgres
   - ollama
-  - monitoring
+
