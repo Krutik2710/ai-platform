@@ -38,7 +38,12 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: password
-
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openai-secret
+                  key: api-key
+                  
           resources:
             requests:
               cpu: "100m"
