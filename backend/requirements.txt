@@ -7,3 +7,4 @@ ollama
 psycopg[binary]
 pgvector
 pypdf
+prometheus-client

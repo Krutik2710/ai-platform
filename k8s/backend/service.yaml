@@ -11,5 +11,5 @@ spec:
     - protocol: TCP
       port: 8000
       targetPort: 8000
-
+      name: http
   type: ClusterIP
