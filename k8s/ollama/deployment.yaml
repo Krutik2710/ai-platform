@@ -16,6 +16,20 @@ spec:
       containers:
         - name: ollama
           image: ollama/ollama:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              ollama serve &
+              OLLAMA_PID=$!
+
+              until ollama list >/dev/null 2>&1; do
+                sleep 2
+              done
+
+              ollama pull llama3.1:8b
+
+              wait $OLLAMA_PID
           ports:
             - containerPort: 11434
           resources:
