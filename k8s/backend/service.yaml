@@ -3,13 +3,13 @@ kind: Service
 metadata:
   name: ai-platform-api
   namespace: ai-platform
+  labels:
+    app: ai-platform-api
 spec:
   selector:
     app: ai-platform-api
-
   ports:
-    - protocol: TCP
+    - name: http
       port: 8000
       targetPort: 8000
-      name: http
   type: ClusterIP
