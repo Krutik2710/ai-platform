@@ -1,5 +1,5 @@
-from backend.app.rag.db import get_connection
-from backend.app.rag.embeddings import create_embedding
+from .db import get_connection
+from .embeddings import create_embedding
 
 
 def search_similar_chunks(query: str, limit: int = 5) -> list[dict]:

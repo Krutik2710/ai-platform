@@ -1,7 +1,6 @@
-from backend.app.rag.db import get_connection
-from backend.app.rag.embeddings import create_embedding
-from backend.app.rag.chunking import chunk_text
-
+from .rag.db import init_db
+from .rag.ingestion import ingest_document
+from .rag.retrieval import search_similar_chunks
 
 def ingest_document(filename: str, text: str) -> int:
     chunks = chunk_text(text)

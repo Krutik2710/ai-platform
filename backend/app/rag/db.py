@@ -35,7 +35,7 @@ def init_db():
                     document_id INTEGER NOT NULL
                         REFERENCES documents(id) ON DELETE CASCADE,
                     chunk_text TEXT NOT NULL,
-                    embedding vector(384),
+                    embedding vector(1536),
                     created_at TIMESTAMPTZ DEFAULT NOW()
                 )
                 """
