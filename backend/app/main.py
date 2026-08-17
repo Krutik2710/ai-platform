@@ -10,6 +10,8 @@ from .rag.retrieval import search_similar_chunks
 
 from .rag.generation import generate_answer
 
+from .rag.chat import create_session, add_message, get_messages
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -56,9 +58,18 @@ def upload_document(document: DocumentRequest):
 class QueryRequest(BaseModel):
     question: str
     limit: int = 5
+    session_id: int | None = None
+
 
 @app.post("/query")
 def query_documents(request: QueryRequest):
+    session_id = request.session_id
+
+    if session_id is None:
+        session_id = create_session()
+
+    add_message(session_id, "user", request.question)
+
     results = search_similar_chunks(
         request.question,
         request.limit,
@@ -71,8 +82,18 @@ def query_documents(request: QueryRequest):
         context,
     )
 
+    add_message(session_id, "assistant", answer)
+
     return {
+        "session_id": session_id,
         "question": request.question,
         "answer": answer,
         "results": results,
+    }
+
+@app.get("/chat/{session_id}")
+def chat_history(session_id: int):
+    return {
+        "session_id": session_id,
+        "messages": get_messages(session_id),
     }
