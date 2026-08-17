@@ -7,4 +7,4 @@ resources:
 
 images:
   - name: ghcr.io/krutik2710/ai-platform-api
-    newTag: sha-3d24dc5
+    newTag: sha-35d62ab
