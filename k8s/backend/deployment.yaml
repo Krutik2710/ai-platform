@@ -23,6 +23,21 @@ spec:
 
           ports:
             - containerPort: 8000
+          
+          env:
+            - name: POSTGRES_HOST
+              value: postgres
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: ai_platform
+            - name: POSTGRES_USER
+              value: ai_platform
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
 
           resources:
             requests:
