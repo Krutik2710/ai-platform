@@ -93,13 +93,13 @@ It provides:
 
 <!-- SCREENSHOT: Add your clean final frontend screenshot here -->
 
-`![AI Platform UI](docs/screenshots/01-frontend.png)`
+![AI Platform UI](docs/screenshots/frontend.png)
 
 ### RAG Query
 
 <!-- SCREENSHOT: Add the screenshot showing a question, answer and retrieved sources -->
 
-![RAG Query](docs/screenshots/02-rag-query.png)
+![RAG Query](docs/screenshots/rag-query.png)
 
 ---
 
@@ -334,7 +334,7 @@ Push to Git
 
 <!-- SCREENSHOT: Add successful GitHub Actions workflow screenshot -->
 
-`![GitHub Actions](docs/screenshots/06-github-actions.png)`
+![GitHub Actions](docs/screenshots/github-actions.png)
 
 The pipeline automatically updates the Kubernetes image tag, which allows ArgoCD to detect the desired-state change.
 
@@ -374,7 +374,7 @@ ArgoCD provides:
 
 <!-- SCREENSHOT: Add ArgoCD Synced + Healthy screenshot -->
 
-`![ArgoCD](docs/screenshots/07-argocd.png)`
+![ArgoCD](docs/screenshots/argocd.png)
 
 ---
 
@@ -412,13 +412,7 @@ Grafana
 
 <!-- SCREENSHOT: Add Grafana dashboard screenshot -->
 
-`![Grafana Dashboard](docs/screenshots/08-grafana.png)`
-
-### Prometheus Targets
-
-<!-- SCREENSHOT: Add Prometheus Targets screenshot if you captured it -->
-
-`![Prometheus Targets](docs/screenshots/09-prometheus-targets.png)`
+![Grafana Dashboard](docs/screenshots/grafana.png)
 
 ---
 
@@ -441,7 +435,7 @@ The generated S3 key is stored alongside the document metadata in PostgreSQL.
 
 <!-- SCREENSHOT: Add S3 bucket screenshot -->
 
-`![S3 Bucket](docs/screenshots/03-s3.png)`
+![S3 Bucket](docs/screenshots/s3.png)
 
 ---
 
@@ -485,7 +479,7 @@ The relationship between documents and chunks uses foreign keys with cascading d
 
 <!-- SCREENSHOT: Add PostgreSQL documents/chunks screenshot -->
 
-`![PostgreSQL](docs/screenshots/10-postgresql.png)`
+![PostgreSQL](docs/screenshots/postgresql.png)
 
 ---
 
@@ -573,14 +567,6 @@ ai-platform/
     └── workflows/
         └── build-and-push.yml
 ```
-
-### Repository
-
-<!-- SCREENSHOT: Add GitHub repository structure screenshot -->
-
-`![Repository](docs/screenshots/11-repository.png)`
-
----
 
 # 🎯 Key Engineering Decisions
 
@@ -685,43 +671,43 @@ A quick gallery of the project:
 
 <!-- SCREENSHOT: Frontend -->
 
-`![Frontend](docs/screenshots/01-frontend.png)`
+![Frontend](docs/screenshots/frontend.png)
 
 ### RAG in Action
 
 <!-- SCREENSHOT: RAG -->
 
-`![RAG](docs/screenshots/02-rag-query.png)`
+![RAG](docs/screenshots/rag-query.png)
 
 ### AWS S3
 
 <!-- SCREENSHOT: S3 -->
 
-`![S3](docs/screenshots/03-s3.png)`
+![S3](docs/screenshots/s3.png)
 
 ### Kubernetes
 
 <!-- SCREENSHOT: Kubernetes pods -->
 
-`![Kubernetes](docs/screenshots/04-kubernetes.png)`
+![Kubernetes](docs/screenshots/kubernetes.png)
 
 ### GitHub Actions
 
 <!-- SCREENSHOT: GitHub Actions -->
 
-`![CI/CD](docs/screenshots/06-github-actions.png)`
+![CI/CD](docs/screenshots/github-actions.png)
 
 ### ArgoCD
 
 <!-- SCREENSHOT: ArgoCD -->
 
-`![ArgoCD](docs/screenshots/07-argocd.png)`
+![ArgoCD](docs/screenshots/argocd.png)
 
 ### Grafana
 
 <!-- SCREENSHOT: Grafana -->
 
-`![Grafana](docs/screenshots/08-grafana.png)`
+![Grafana](docs/screenshots/grafana.png)
 
 ---
 
