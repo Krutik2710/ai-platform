@@ -99,7 +99,7 @@ It provides:
 
 <!-- SCREENSHOT: Add the screenshot showing a question, answer and retrieved sources -->
 
-`![RAG Query](docs/screenshots/02-rag-query.png)`
+![RAG Query](docs/screenshots/02-rag-query.png)
 
 ---
 
