@@ -7,4 +7,4 @@ resources:
   - servicemonitor.yaml
 images:
   - name: ghcr.io/krutik2710/ai-platform-api
-    newTag: sha-a8b87b6
+    newTag: sha-3024821
