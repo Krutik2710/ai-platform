@@ -21,8 +21,7 @@ from .rag.document_loader import extract_text
 
 import uuid
 
-from .storage.s3 import upload_document, delete_document
-
+from .storage.s3 import upload_document as upload_to_s3, delete_document
 
 # -------------------------------------------------------------------
 # Prometheus metrics
@@ -176,7 +175,7 @@ async def upload_document_file(file: UploadFile = File(...)):
 
         content_type = file.content_type or "application/octet-stream"
 
-        upload_document(
+        upload_to_s3(
             file_bytes=content,
             s3_key=s3_key,
             content_type=content_type,
