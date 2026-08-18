@@ -72,3 +72,27 @@ def init_db():
             )
 
         conn.commit()
+
+
+def get_documents() -> list[dict]:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT id, filename, s3_key, created_at
+                FROM documents
+                ORDER BY created_at DESC
+                """
+            )
+
+            rows = cur.fetchall()
+
+    return [
+        {
+            "id": row[0],
+            "filename": row[1],
+            "s3_key": row[2],
+            "created_at": row[3],
+        }
+        for row in rows
+    ]

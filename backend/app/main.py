@@ -12,11 +12,16 @@ from prometheus_client import (
     CONTENT_TYPE_LATEST,
 )
 
-from .rag.db import init_db
+from .rag.db import init_db, get_documents
 from .rag.ingestion import ingest_document
 from .rag.retrieval import search_similar_chunks
 from .rag.generation import generate_answer
-from .rag.chat import create_session, add_message, get_messages
+from .rag.chat import (
+    create_session,
+    add_message,
+    get_messages,
+    get_chat_sessions,
+)
 from .rag.document_loader import extract_text
 
 import uuid
@@ -142,6 +147,13 @@ def metrics():
 # Document ingestion
 # -------------------------------------------------------------------
 
+@app.get("/documents")
+def list_documents():
+    return {
+        "documents": get_documents(),
+    }
+
+
 @app.post("/documents")
 def upload_document(document: DocumentRequest):
     try:
@@ -261,6 +273,12 @@ def query_documents(request: QueryRequest):
 # -------------------------------------------------------------------
 # Chat history
 # -------------------------------------------------------------------
+
+@app.get("/chat-sessions")
+def list_chat_sessions():
+    return {
+        "sessions": get_chat_sessions(),
+    }
 
 @app.get("/chat/{session_id}")
 def chat_history(session_id: int):
