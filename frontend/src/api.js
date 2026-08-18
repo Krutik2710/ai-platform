@@ -22,6 +22,12 @@ export async function checkHealth() {
 }
 
 
+export async function getDocuments() {
+  const response = await fetch("/api/documents");
+  return handleResponse(response);
+}
+
+
 export async function uploadDocument(file) {
   const formData = new FormData();
 
@@ -61,5 +67,11 @@ export async function queryDocuments(
 
 export async function getChatHistory(sessionId) {
   const response = await fetch(`/api/chat/${sessionId}`);
+  return handleResponse(response);
+}
+
+
+export async function getChatSessions() {
+  const response = await fetch("/api/chat-sessions");
   return handleResponse(response);
 }

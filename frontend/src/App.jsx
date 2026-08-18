@@ -2,15 +2,23 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   checkHealth,
+  getDocuments,
   uploadDocument,
   queryDocuments,
+  getChatHistory,
+  getChatSessions,
 } from "./api";
+
+
+const CURRENT_SESSION_KEY = "ai-platform-session";
 
 
 function App() {
   const [health, setHealth] = useState("checking");
 
   const [documents, setDocuments] = useState([]);
+
+  const [chatSessions, setChatSessions] = useState([]);
 
   const [messages, setMessages] = useState([]);
 
@@ -22,6 +30,8 @@ function App() {
 
   const [uploading, setUploading] = useState(false);
 
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
   const [error, setError] = useState("");
 
   const fileInputRef = useRef(null);
@@ -29,10 +39,70 @@ function App() {
   const messagesEndRef = useRef(null);
 
 
+  /*
+   * Initial application load
+   *
+   * 1. Check API health
+   * 2. Load persistent documents
+   * 3. Load chat history list
+   * 4. Restore the previously active session, if one exists
+   */
   useEffect(() => {
-    checkHealth()
-      .then(() => setHealth("online"))
-      .catch(() => setHealth("offline"));
+    async function initialize() {
+      setError("");
+
+      try {
+        await checkHealth();
+        setHealth("online");
+      } catch {
+        setHealth("offline");
+      }
+
+      try {
+        const documentsResult = await getDocuments();
+
+        setDocuments(
+          (documentsResult.documents || []).map((document) => ({
+            name: document.filename,
+            s3Key: document.s3_key,
+            documentId: document.id,
+            createdAt: document.created_at,
+          }))
+        );
+      } catch (err) {
+        setError(err.message);
+      }
+
+      try {
+        const sessionsResult = await getChatSessions();
+
+        const sessions = sessionsResult.sessions || [];
+
+        setChatSessions(sessions);
+
+        const storedSessionId = localStorage.getItem(
+          CURRENT_SESSION_KEY
+        );
+
+        if (storedSessionId) {
+          const numericSessionId = Number(storedSessionId);
+
+          const sessionExists = sessions.some(
+            (session) => session.id === numericSessionId
+          );
+
+          if (sessionExists) {
+            await loadChat(numericSessionId);
+          } else {
+            localStorage.removeItem(CURRENT_SESSION_KEY);
+          }
+        }
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+
+    initialize();
   }, []);
 
 
@@ -43,6 +113,57 @@ function App() {
   }, [messages]);
 
 
+  /*
+   * Load one complete conversation.
+   */
+  async function loadChat(id) {
+    setLoadingHistory(true);
+    setError("");
+
+    try {
+      const result = await getChatHistory(id);
+
+      setSessionId(result.session_id);
+
+      setMessages(
+        (result.messages || []).map((message) => ({
+          role: message.role,
+          content: message.content,
+          sources: [],
+        }))
+      );
+
+      localStorage.setItem(
+        CURRENT_SESSION_KEY,
+        String(result.session_id)
+      );
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }
+
+
+  /*
+   * Start a completely new conversation.
+   *
+   * The old session is NOT deleted from PostgreSQL.
+   */
+  function handleNewChat() {
+    setSessionId(null);
+    setMessages([]);
+    setQuestion("");
+    setError("");
+
+    localStorage.removeItem(CURRENT_SESSION_KEY);
+  }
+
+
+  /*
+   * Upload a document and then reload the persistent
+   * document list from PostgreSQL.
+   */
   async function handleUpload(event) {
     const file = event.target.files?.[0];
 
@@ -54,16 +175,18 @@ function App() {
     setError("");
 
     try {
-      const result = await uploadDocument(file);
+      await uploadDocument(file);
 
-      setDocuments((current) => [
-        ...current,
-        {
-          name: result.filename,
-          s3Key: result.s3_key,
-          documentId: result.document_id,
-        },
-      ]);
+      const result = await getDocuments();
+
+      setDocuments(
+        (result.documents || []).map((document) => ({
+          name: document.filename,
+          s3Key: document.s3_key,
+          documentId: document.id,
+          createdAt: document.created_at,
+        }))
+      );
     } catch (err) {
       setError(err.message);
     } finally {
@@ -76,6 +199,9 @@ function App() {
   }
 
 
+  /*
+   * Submit a RAG question.
+   */
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -107,6 +233,11 @@ function App() {
 
       setSessionId(result.session_id);
 
+      localStorage.setItem(
+        CURRENT_SESSION_KEY,
+        String(result.session_id)
+      );
+
       setMessages((current) => [
         ...current,
         {
@@ -115,6 +246,14 @@ function App() {
           sources: result.results || [],
         },
       ]);
+
+      /*
+       * Refresh the chat list so a newly created session
+       * immediately appears in the sidebar.
+       */
+      const sessionsResult = await getChatSessions();
+
+      setChatSessions(sessionsResult.sessions || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -166,6 +305,8 @@ function App() {
       <main className="workspace">
 
         <aside className="sidebar">
+
+          {/* DOCUMENTS */}
 
           <div className="section-heading">
             <span>01</span>
@@ -250,6 +391,67 @@ function App() {
           </button>
 
 
+          {/* CHAT HISTORY */}
+
+          <div className="chat-history-section">
+
+            <div className="section-heading">
+              <span>03</span>
+              CHAT HISTORY
+            </div>
+
+
+            <button
+              className="new-chat-button"
+              onClick={handleNewChat}
+            >
+              <span>+ NEW CHAT</span>
+              <span>↗</span>
+            </button>
+
+
+            <div className="chat-history-list">
+
+              {chatSessions.length === 0 ? (
+
+                <div className="empty-chat-history">
+                  No conversations yet.
+                </div>
+
+              ) : (
+
+                chatSessions.map((session) => (
+
+                  <button
+                    key={session.id}
+                    className={`chat-history-item ${
+                      session.id === sessionId
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() => loadChat(session.id)}
+                    disabled={loadingHistory}
+                  >
+
+                    <span className="chat-history-id">
+                      #{session.id}
+                    </span>
+
+                    <span className="chat-history-title">
+                      {session.title}
+                    </span>
+
+                  </button>
+
+                ))
+
+              )}
+
+            </div>
+
+          </div>
+
+
           <div className="sidebar-footer">
 
             <div className="stack-item">
@@ -320,6 +522,16 @@ function App() {
                 </div>
 
               </div>
+
+            )}
+
+
+            {loadingHistory && (
+
+              <div className="history-loading">
+                LOADING CONVERSATION...
+              </div>
+
             )}
 
 
@@ -327,7 +539,7 @@ function App() {
 
               <div
                 className={`message-row ${message.role}`}
-                key={index}
+                key={`${sessionId}-${index}`}
               >
 
                 <div className="message-label">
@@ -446,12 +658,16 @@ function App() {
                 setQuestion(event.target.value)
               }
               placeholder="Ask something about your documents..."
-              disabled={loading}
+              disabled={loading || loadingHistory}
             />
 
             <button
               type="submit"
-              disabled={loading || !question.trim()}
+              disabled={
+                loading ||
+                loadingHistory ||
+                !question.trim()
+              }
             >
               {loading ? "..." : "SEND"}
             </button>

@@ -1,4 +1,4 @@
-name: Build and Push API
+name: Build and Push Images
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "backend/**"
+      - "frontend/**"
       - "tests/**"
       - ".github/workflows/build-and-push.yml"
 
@@ -15,15 +16,26 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/ai-platform-api
+  API_IMAGE_NAME: ${{ github.repository_owner }}/ai-platform-api
+  FRONTEND_IMAGE_NAME: ${{ github.repository_owner }}/ai-platform-frontend
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
+
+      # ------------------------------------------------------------
+      # Checkout
+      # ------------------------------------------------------------
+
       - name: Checkout repository
         uses: actions/checkout@v4
+
+
+      # ------------------------------------------------------------
+      # Backend tests
+      # ------------------------------------------------------------
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,6 +48,11 @@ jobs:
       - name: Run tests
         run: pytest
 
+
+      # ------------------------------------------------------------
+      # Login to GHCR
+      # ------------------------------------------------------------
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -43,38 +60,83 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
+
+      # ------------------------------------------------------------
+      # API image metadata
+      # ------------------------------------------------------------
+
+      - name: Extract API image metadata
+        id: api-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}
           tags: |
             type=sha,format=short
 
-      - name: Build and push image
+
+      # ------------------------------------------------------------
+      # Build and push API
+      # ------------------------------------------------------------
+
+      - name: Build and push API image
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.api-meta.outputs.tags }}
+          labels: ${{ steps.api-meta.outputs.labels }}
 
-      - name: Update GitOps image tag
+
+      # ------------------------------------------------------------
+      # Frontend image metadata
+      # ------------------------------------------------------------
+
+      - name: Extract frontend image metadata
+        id: frontend-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=sha,format=short
+
+
+      # ------------------------------------------------------------
+      # Build and push frontend
+      # ------------------------------------------------------------
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ steps.frontend-meta.outputs.tags }}
+          labels: ${{ steps.frontend-meta.outputs.labels }}
+
+
+      # ------------------------------------------------------------
+      # Update GitOps image tags
+      # ------------------------------------------------------------
+
+      - name: Update GitOps image tags
         run: |
           TAG="sha-${GITHUB_SHA::7}"
 
           sed -i "s/newTag: .*/newTag: ${TAG}/" k8s/backend/kustomization.yaml
 
+          sed -i "s/newTag: .*/newTag: ${TAG}/" k8s/frontend/kustomization.yaml
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add k8s/backend/kustomization.yaml
+          git add \
+            k8s/backend/kustomization.yaml \
+            k8s/frontend/kustomization.yaml
 
           if git diff --cached --quiet; then
-            echo "Image tag already up to date"
+            echo "Image tags already up to date"
             exit 0
           fi
 
-          git commit -m "chore: update API image to ${TAG}"
-          git push   
-          
+          git commit -m "chore: update application image tags to ${TAG}"
+
+          git push
