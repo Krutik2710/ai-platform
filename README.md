@@ -2,6 +2,10 @@
 
 > **A production-style, cloud-native RAG platform built end-to-end with Kubernetes, GitOps, CI/CD, AWS, and observability.**
 
+## 🏗️ Architecture
+
+![AI Platform Architecture](docs/screenshots/architecture.png)
+
 AI Platform is a full-stack Retrieval-Augmented Generation (RAG) system that lets users upload documents, index their content, and ask questions against their own knowledge base.
 
 But the goal wasn't just to build another chatbot.
