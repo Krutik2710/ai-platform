@@ -7,4 +7,4 @@ resources:
 
 images:
   - name: ghcr.io/krutik2710/ai-platform-frontend
-    newTag: sha-initial
+    newTag: sha-d6f8365
