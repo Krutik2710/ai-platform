@@ -3,7 +3,11 @@ from .embeddings import create_embedding
 from .chunking import chunk_text
 
 
-def ingest_document(filename: str, text: str) -> int:
+def ingest_document(
+    filename: str,
+    text: str,
+    s3_key: str | None = None,
+) -> int:
     chunks = chunk_text(text)
 
     if not chunks:
@@ -13,11 +17,11 @@ def ingest_document(filename: str, text: str) -> int:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO documents (filename)
-                VALUES (%s)
+                INSERT INTO documents (filename, s3_key)
+                VALUES (%s, %s)
                 RETURNING id
                 """,
-                (filename,),
+                (filename, s3_key),
             )
 
             document_id = cur.fetchone()[0]

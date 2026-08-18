@@ -19,6 +19,10 @@ from .rag.generation import generate_answer
 from .rag.chat import create_session, add_message, get_messages
 from .rag.document_loader import extract_text
 
+import uuid
+
+from .storage.s3 import upload_document, delete_document
+
 
 # -------------------------------------------------------------------
 # Prometheus metrics
@@ -161,30 +165,55 @@ def upload_document(document: DocumentRequest):
 
 @app.post("/documents/upload")
 async def upload_document_file(file: UploadFile = File(...)):
+    s3_key = None
+
     try:
         content = await file.read()
 
+        filename = file.filename or "document"
+
+        s3_key = f"documents/{uuid.uuid4()}/{filename}"
+
+        content_type = file.content_type or "application/octet-stream"
+
+        upload_document(
+            file_bytes=content,
+            s3_key=s3_key,
+            content_type=content_type,
+        )
+
         text = extract_text(
-            file.filename or "document",
+            filename,
             content,
         )
 
         document_id = ingest_document(
-            file.filename or "document",
+            filename,
             text,
+            s3_key,
         )
 
         return {
             "document_id": document_id,
-            "filename": file.filename,
+            "filename": filename,
             "status": "ingested",
+            "s3_key": s3_key,
         }
 
     except ValueError as exc:
+        if s3_key:
+            delete_document(s3_key)
+
         raise HTTPException(
             status_code=400,
             detail=str(exc),
         )
+
+    except Exception:
+        if s3_key:
+            delete_document(s3_key)
+
+        raise
 
 
 # -------------------------------------------------------------------

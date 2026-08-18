@@ -23,8 +23,16 @@ def init_db():
                 CREATE TABLE IF NOT EXISTS documents (
                     id SERIAL PRIMARY KEY,
                     filename TEXT NOT NULL,
+                    s3_key TEXT,
                     created_at TIMESTAMPTZ DEFAULT NOW()
                 )
+                """
+            )
+
+            cur.execute(
+                """
+                ALTER TABLE documents
+                ADD COLUMN IF NOT EXISTS s3_key TEXT
                 """
             )
 
@@ -62,4 +70,5 @@ def init_db():
                 )
                 """
             )
+
         conn.commit()

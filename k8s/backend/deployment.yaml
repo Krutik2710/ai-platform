@@ -23,7 +23,7 @@ spec:
 
           ports:
             - containerPort: 8000
-          
+
           env:
             - name: POSTGRES_HOST
               value: postgres
@@ -43,7 +43,11 @@ spec:
                 secretKeyRef:
                   name: openai-secret
                   key: api-key
-                  
+            - name: S3_BUCKET
+              value: ai-platform-documents-2026
+            - name: AWS_REGION
+              value: ap-south-1
+
           resources:
             requests:
               cpu: "100m"
