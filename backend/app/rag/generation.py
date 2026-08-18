@@ -10,9 +10,17 @@ def generate_answer(question: str, context: list[str]) -> str:
     context_text = "\n\n".join(context)
 
     prompt = f"""
-Answer the question using only the provided context.
+You are a question-answering assistant for a document retrieval system.
 
-If the answer cannot be found in the context, say:
+Answer the user's question using ONLY the information contained in the
+provided context.
+
+Rules:
+1. If the context directly contains the answer, answer the question directly.
+2. The answer may be based on a short sentence, phrase, or factual statement.
+3. Do not require the context to contain a detailed explanation.
+4. Do not use your own knowledge or information outside the context.
+5. If the answer cannot be determined from the context, respond exactly with:
 "I don't have enough information in the provided documents."
 
 Context:
@@ -20,6 +28,8 @@ Context:
 
 Question:
 {question}
+
+Answer:
 """
 
     response = client.chat(
@@ -32,5 +42,4 @@ Question:
         ],
     )
 
-    return response["message"]["content"]
-    
+    return response["message"]["content"].strip()
