@@ -13,7 +13,7 @@ The project was built around the **platform engineering and DevOps side of AI wo
 ## 🎥 Walkthrough
 
 **Full project walkthrough:**
-👉 `ADD YOUR VIDEO LINK HERE`
+https://youtu.be/2t5sM9Bt_AM
 
 The walkthrough covers:
 
