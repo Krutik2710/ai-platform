@@ -12,8 +12,9 @@ The project was built around the **platform engineering and DevOps side of AI wo
 
 ## 🎥 Walkthrough
 
-**Full project walkthrough:**
-https://youtu.be/2t5sM9Bt_AM
+[![AI Platform — Full Project Walkthrough](https://img.youtube.com/vi/2t5sM9Bt_AM/maxresdefault.jpg)](https://youtu.be/2t5sM9Bt_AM)
+
+> ▶️ **Watch the full walkthrough:** AI Platform — Cloud-Native RAG, Kubernetes, GitOps & CI/CD
 
 The walkthrough covers:
 
@@ -27,8 +28,6 @@ The walkthrough covers:
 * ArgoCD GitOps deployment
 * Prometheus + Grafana observability
 * Application access through Kubernetes port-forwarding
-
-> **[🎬 Add walkthrough video / YouTube link here]**
 
 ---
 
